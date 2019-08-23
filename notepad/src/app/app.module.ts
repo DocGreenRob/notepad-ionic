@@ -10,7 +10,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 /************ Manual Imports ************/
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { httpIntepectorService } from './helpers/http-inteceptor/http-intepector.service';
 
 @NgModule({
 	declarations: [AppComponent],
@@ -20,12 +21,14 @@ import { HttpClientModule } from '@angular/common/http';
 		IonicModule.forRoot(),
 		AppRoutingModule,
 		/************ Manual Imports ************/
-		HttpClientModule
+        HttpClientModule
 	],
 	providers: [
 		StatusBar,
 		SplashScreen,
-		{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+        // provider used to create fake backend
+        httpIntepectorService
 	],
 	bootstrap: [AppComponent]
 })

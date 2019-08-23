@@ -5,7 +5,8 @@
 export const environment = {
 	production: false,
 	/*********** Manual Additions ***********/
-	apiEndpoint: "http://api.cognitivegenerationenterprises.com/api/"
+    apiEndpoint: "http://api.cognitivegenerationenterprises.com/api/",
+    useMockHttpService: true
 };
 
 /*
