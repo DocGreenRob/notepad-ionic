@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Data } from '@angular/router';
-import { TestDataFactory } from '../test-data-factory/test-data-factory';
+import { TestDataFactory } from '../../test-data-factory/test-data-factory';
 import { ActivityFeed, ActivityService } from './activity.service';
 
 

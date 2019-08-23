@@ -1,4 +1,4 @@
-﻿import { ActivityFeed } from '../providers/activity.service';
+﻿import { ActivityFeed } from '../providers/activity/activity.service';
 
 export class TestDataFactory {
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivityService } from 'src/app/providers/activity.service';
+import { ActivityService } from 'src/app/providers/activity/activity.service';
 /******* Manual Additions ********/
 
 @Component({

@@ -21,14 +21,14 @@ import { httpIntepectorService } from './helpers/http-inteceptor/http-intepector
 		IonicModule.forRoot(),
 		AppRoutingModule,
 		/************ Manual Imports ************/
-        HttpClientModule
+		HttpClientModule
 	],
 	providers: [
 		StatusBar,
 		SplashScreen,
-        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        // provider used to create fake backend
-        httpIntepectorService
+		{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+		// provider used to create fake backend
+		httpIntepectorService
 	],
 	bootstrap: [AppComponent]
 })
