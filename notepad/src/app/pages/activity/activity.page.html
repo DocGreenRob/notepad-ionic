@@ -1,0 +1,18 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-title>Activity Feed</ion-title>
+	</ion-toolbar>
+</ion-header>
+<ion-content>
+	<ion-list>
+		<ion-item *ngFor="let activity of activityFeed">
+			{{activity.Type}}
+			<br style="clear:both;" />
+			{{activity.EndTimeString}}
+			<br style="clear:both;" />
+			<div *ngIf="activity.Weight > 0">Weight: {{activity.Weight}} | </div>
+			<div *ngIf="activity.Reps > 0">Reps: {{activity.Reps}} | </div>
+			<div *ngIf="activity.Duration">Duration: {{activity.Duration}}</div>
+		</ion-item>
+	</ion-list>
+</ion-content>
