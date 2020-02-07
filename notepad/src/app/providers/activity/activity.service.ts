@@ -38,7 +38,7 @@ export class ActivityService {
 		if (userName === undefined ||
 			userName === null ||
 			userName.trim() === '') {
-			throw new Error('ArgumentNullError: Username is not specified.');
+			throw new Error(`ArgumentNullError: Username is not specified.`);
 		}
 
 		if (count === 0) {
@@ -53,9 +53,8 @@ export class ActivityService {
 
 		/******* prepare *******/
 		let url = `${environment.apiEndpoint}activity/getFeed/${userName}/${seed}/${count}`;
-		console.log(url);
 
 		/******* action *******/
-		return this.http.get<ActivityFeed[]>(`${environment.apiEndpoint}activity/getFeed/${userName}/${seed}/${count}`).toPromise();
+		return this.http.get<ActivityFeed[]>(url).toPromise();
 	}
 }

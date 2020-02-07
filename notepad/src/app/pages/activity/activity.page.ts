@@ -23,7 +23,7 @@ export class ActivityPage implements OnInit {
 	}
 
 	async GetFeed() {
-		await this.activityService.getFeed('DocGreenRob', 0, 100)
+		await this.activityService.getFeed('DocGreenRob', 0, 10)
 			.then((x: any) => {
 				this.activityFeed = x;
 			})

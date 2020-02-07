@@ -1,14 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 // Http testing module and mocking controller
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Data } from '@angular/router';
 import { TestDataFactory } from '../../test-data-factory/test-data-factory';
 import { ActivityFeed, ActivityService } from './activity.service';
+import { environment } from '../../../environments/environment';
 
-
-
-
+// https://medium.com/netscape/testing-with-the-angular-httpclient-api-648203820712
 describe('ActivityService', () => {
 	let httpClient: HttpClient;
 	let httpTestingController: HttpTestingController;
@@ -29,97 +28,169 @@ describe('ActivityService', () => {
 		expect(service).toBeTruthy();
 	});
 
+	// +____________________________+
+	// |----------------------------|
+	// |       Positive Tests       |
+	// |----------------------------|
+	// |____________________________|
+
+	// /api/{userName}/0/10
+	it('should call the correct endpoint and return the correct data', () => {
+		// Arrange
+		let userName: string = 'DocGreenRob';
+		let seed: number = 0;
+		let count: number = 10;
+		let baseUri: string = environment.apiEndpoint;
+		let api: string = `activity/getFeed/${userName}/${seed}/${count}`;
+		let endpoint: string = `${baseUri}${api}`;
+
+		// Act
+		service.getFeed(userName, seed, count).then((x) => {
+			expect(x.length).toBe(count);
+			expect(x[0].Id).toBe(1);
+			expect(x[0].Type).toBe('Exercise: Chest - Decline Push-Ups');
+			expect(x[0].StartTimeString).toBe('8/18/2019 8:15:29 PM');
+			expect(x[9].Id).toBe(10);
+			expect(x[9].Type).toBe('Exercise: Chest - Decline Push-Ups');
+			expect(x[9].StartTimeString).toBe('8/18/2019 8:10:29 PM');
+		});
+
+		// Assert
+		let req: TestRequest = httpTestingController.expectOne(endpoint);
+		expect(req.request.method).toEqual('GET');
+		req.flush(new TestDataFactory().GetActivityFeed(count, seed));
+	});
+
 	// /api/userName/0/1
+	// maybe TestDataFactory test...
+	// may not need to test the TestDataFactory - in large part - because the responsiblity of returning the correct data per request is of the Api...
 	it('should get the first record', () => {
+		// Arrange
 		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(1)));
+
+		// Act (trigger)
 		service.getFeed('test-user', 0, 1);
+
+		// Assert
 		spy.calls.mostRecent().returnValue.then((x: ActivityFeed[]) => {
 			expect(x.length).toBe(1);
 			expect(x[0].Id).toBe(1);
+			expect(x[0].Type).toBe('Exercise: Chest - Decline Push-Ups');
 		});
 	});
 
-	// /api/userName/0/10
-	it('should get the first 10 records', () => {
-		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed()));
-		service.getFeed('test-user', 0, 10);
-		spy.calls.mostRecent().returnValue.then((x) => {
-			expect(x.length).toBe(10);
-			expect(x[0].Id).toBe(1);
-			expect(x[9].Id).toBe(10);
-		});
-	});
-
-	// /api/userName/2/2
+	// /api/{userName}/2/2
+	// maybe TestDataFactory test...
+	// may not need to test the TestDataFactory - in large part - because the responsiblity of returning the correct data per request is of the Api...
 	it('should get records 2 and 3', () => {
-		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(2, 2)));
-		service.getFeed('test-user', 2, 2);
+		// Arrange
+		let seed: number = 2;
+		let count: number = 2;
+		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(count, seed)));
+
+		// Act
+		service.getFeed('test-user', seed, count);
+
+		// Assert
 		spy.calls.mostRecent().returnValue.then((x) => {
-			expect(x.length).toBe(2);
+			expect(x.length).toBe(count);
 			expect(x[0].Id).toBe(2);
+			expect(x[0].Type).toBe('Exercise: Chest - Decline Push-Ups');
+			expect(x[0].StartTimeString).toBe('8/18/2019 8:14:29 PM');
 			expect(x[1].Id).toBe(3);
+			expect(x[1].Type).toBe('Exercise: Chest - Decline Push-Ups');
+			expect(x[1].StartTimeString).toBe('8/18/2019 8:14:09 PM');
 		});
 	});
 
-	// /api/userName/0/1
+	// /api/{userName}/0/1
+	// maybe TestDataFactory test...
+	// may not need to test the TestDataFactory - in large part - because the responsiblity of returning the correct data per request is of the Api...
 	it('should return empty Array if user doesn\'t have any records', () => {
-		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(0)));
-		service.getFeed('test-user-without-records', 0, 10);
+		// Arrange
+		let count: number = 0;
+		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(count)));
+
+		// Act
+		service.getFeed('test-user-without-records', 0, count);
+
+		// Assert
 		spy.calls.mostRecent().returnValue.then((x) => {
 			expect(x.length).toBe(0);
 		});
 	});
 
-	// /api/userName/0/501
+	// +_________________________________+
+	// |---------------------------------|
+	// |          Negative Tests         |
+	// |---------------------------------|
+	// |_________________________________|
+
+	// /api/{userName}/0/501
 	it('should throw a RangeError if the count > 500', () => {
-		let promise = service.getFeed('test-user-without-records', 0, 501);
+		// Arrange
+		let seed: number = 0;
+		let count: number = 501;
+		let errorMessage: string = 'The max count is 500';
+		let userName: string = 'test-user-with-records';
+
+		// Act
+		let promise = service.getFeed(userName, seed, count);
+
+		// Assert
 		promise.catch((x) => {
-			let expectedError = new RangeError('The max count is 500');
+			let expectedError: RangeError = new RangeError(errorMessage);
 			expect(x).toEqual(expectedError);
 		});
 	});
 
-	// /api/userName/0/0
+	// /api/{userName}/0/0
 	it('should throw a RangeError if the count = 0', () => {
-		//const service: ActivityService = TestBed.get(ActivityService);
-		expect(service).toBeTruthy();
-	});
+		// Arrange
+		let seed: number = 0;
+		let count: number = 0;
+		let errorMessage: string = 'The count must be greater than 0.';
+		let userName: string = 'test-user-with-records';
 
-	it('should get activities for a specific user if the user exists', () => {
+		// Act
+		let promise = service.getFeed(userName, seed, count);
 
-
-		let testUrl: string = 'http://api.cognitivegenerationenterprises.com/api/activity/getFeed/DocGreenRob/0/100';
-
-		httpClient.get<Data>(testUrl).subscribe(x =>
-			expect(x).toEqual(new TestDataFactory().GetActivityFeed(1))
-		);
-
-		//service.http.get<Data>(testUrl).subscribe(x =>
-		//	expect(x).toEqual(testData)
-		//);
-		//service.getFeed().then(x => { });
-
-		const req = httpTestingController.expectOne(x => x.url.startsWith('http://api.cognitivegenerationenterprises.com/api/activity/getFeed/'));
-		expect(req.request.method).toEqual('GET');
-		req.flush(new TestDataFactory().GetActivityFeed(1));
-		httpTestingController.verify();
+		// Assert
+		promise.catch((x) => {
+			let expectedError: RangeError = new RangeError(errorMessage);
+			expect(x).toEqual(expectedError);
+		});
 	});
 
 	it('should throw an exception if the user is not specified', () => {
-		let invalidUserNames: any = [
+		// Arrange
+		let seed: number = 0;
+		let count: number = 0;
+		let errorMessage: string = 'ArgumentNullError: Username is not specified.';
+		let invalidUserNames: Array<any> = [
 			undefined,
 			null,
 			''
 		];
 
-		//const service: ActivityService = TestBed.get(ActivityService);
-		expect(service).toBeTruthy();
+		invalidUserNames.forEach((x) => {
+			// Act
+			let promise = service.getFeed(x, seed, count);
+
+			// Assert
+
+			promise.catch((x) => {
+				let expectedError: Error = new Error(errorMessage);
+				expect(x).toEqual(expectedError);
+			});
+		});
 	});
 
-	it('should throw a 404 exception if the user doesn\'t exist', () => {
-		//const service: ActivityService = TestBed.get(ActivityService);
-		expect(service).toBeTruthy();
-	});
+	// need to handle this at the Interceptor level
+	//it('should throw a 404 exception if the user doesn\'t exist', () => {
+	//	//const service: ActivityService = TestBed.get(ActivityService);
+	//	expect(service).toBeTruthy();
+	//});
 
 	afterEach(() => {
 		httpTestingController.verify();
