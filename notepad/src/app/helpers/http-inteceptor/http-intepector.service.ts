@@ -72,7 +72,7 @@ export class HttpIntepectorService implements HttpInterceptor {
 		// helper functions
 
 		function ok(body?) {
-			return of(new HttpResponse({ status: 200, body }))
+			return of(new HttpResponse({ status: 200, body }));
 		}
 
 		function unauthorized() {
