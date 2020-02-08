@@ -34,8 +34,8 @@ describe('ActivityService', () => {
 	// |----------------------------|
 	// |____________________________|
 
-	// /api/{userName}/0/10
-	it('should call the correct endpoint and return the correct data', () => {
+	// /api/activity/getFeed{userName}/0/10
+	it('should get the feed', () => {
 		// Arrange
 		let userName: string = 'DocGreenRob';
 		let seed: number = 0;
@@ -60,6 +60,79 @@ describe('ActivityService', () => {
 		expect(req.request.method).toEqual('GET');
 		req.flush(new TestDataFactory().GetActivityFeed(count, seed));
 	});
+
+	// +_________________________________+
+	// |---------------------------------|
+	// |          Negative Tests         |
+	// |---------------------------------|
+	// |_________________________________|
+
+	// /api/{userName}/0/501
+	it('should throw a RangeError if the count > 500', () => {
+		// Arrange
+		let seed: number = 0;
+		let count: number = 501;
+		let errorMessage: string = 'The max count is 500';
+		let userName: string = 'test-user-with-records';
+
+		// Act
+		let promise = service.getFeed(userName, seed, count);
+
+		// Assert
+		promise.catch((x) => {
+			let expectedError: RangeError = new RangeError(errorMessage);
+			expect(x).toEqual(expectedError);
+		});
+	});
+
+	// /api/{userName}/0/0
+	it('should throw a RangeError if the count = 0', () => {
+		// Arrange
+		let seed: number = 0;
+		let count: number = 0;
+		let errorMessage: string = 'The count must be greater than 0.';
+		let userName: string = 'test-user-with-records';
+
+		// Act
+		let promise = service.getFeed(userName, seed, count);
+
+		// Assert
+		promise.catch((x) => {
+			let expectedError: RangeError = new RangeError(errorMessage);
+			expect(x).toEqual(expectedError);
+		});
+	});
+
+	it('should throw an Error if the user is not specified', () => {
+		// Arrange
+		let seed: number = 0;
+		let count: number = 0;
+		let errorMessage: string = 'ArgumentNullError: Username is not specified.';
+		let invalidUserNames: Array<any> = [
+			undefined,
+			null,
+			''
+		];
+
+		invalidUserNames.forEach((x) => {
+			// Act
+			let promise = service.getFeed(x, seed, count);
+
+			// Assert
+
+			promise.catch((x) => {
+				let expectedError: Error = new Error(errorMessage);
+				expect(x).toEqual(expectedError);
+			});
+		});
+	});
+
+	afterEach(() => {
+		httpTestingController.verify();
+	});
+
+	// ... aux ...
+	/*******************************************************************/
 
 	// /api/userName/0/1
 	// maybe TestDataFactory test...
@@ -120,80 +193,11 @@ describe('ActivityService', () => {
 		});
 	});
 
-	// +_________________________________+
-	// |---------------------------------|
-	// |          Negative Tests         |
-	// |---------------------------------|
-	// |_________________________________|
-
-	// /api/{userName}/0/501
-	it('should throw a RangeError if the count > 500', () => {
-		// Arrange
-		let seed: number = 0;
-		let count: number = 501;
-		let errorMessage: string = 'The max count is 500';
-		let userName: string = 'test-user-with-records';
-
-		// Act
-		let promise = service.getFeed(userName, seed, count);
-
-		// Assert
-		promise.catch((x) => {
-			let expectedError: RangeError = new RangeError(errorMessage);
-			expect(x).toEqual(expectedError);
-		});
-	});
-
-	// /api/{userName}/0/0
-	it('should throw a RangeError if the count = 0', () => {
-		// Arrange
-		let seed: number = 0;
-		let count: number = 0;
-		let errorMessage: string = 'The count must be greater than 0.';
-		let userName: string = 'test-user-with-records';
-
-		// Act
-		let promise = service.getFeed(userName, seed, count);
-
-		// Assert
-		promise.catch((x) => {
-			let expectedError: RangeError = new RangeError(errorMessage);
-			expect(x).toEqual(expectedError);
-		});
-	});
-
-	it('should throw an exception if the user is not specified', () => {
-		// Arrange
-		let seed: number = 0;
-		let count: number = 0;
-		let errorMessage: string = 'ArgumentNullError: Username is not specified.';
-		let invalidUserNames: Array<any> = [
-			undefined,
-			null,
-			''
-		];
-
-		invalidUserNames.forEach((x) => {
-			// Act
-			let promise = service.getFeed(x, seed, count);
-
-			// Assert
-
-			promise.catch((x) => {
-				let expectedError: Error = new Error(errorMessage);
-				expect(x).toEqual(expectedError);
-			});
-		});
-	});
-
 	// need to handle this at the Interceptor level
 	//it('should throw a 404 exception if the user doesn\'t exist', () => {
 	//	//const service: ActivityService = TestBed.get(ActivityService);
 	//	expect(service).toBeTruthy();
 	//});
 
-	afterEach(() => {
-		httpTestingController.verify();
-	});
-
+	/*******************************************************************/
 });
