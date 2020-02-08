@@ -107,7 +107,7 @@ describe('ActivityService', () => {
 		// Arrange
 		let seed: number = 0;
 		let count: number = 0;
-		let errorMessage: string = 'ArgumentNullError: Username is not specified.';
+		let errorMessage: string = 'Username is not specified.';
 		let invalidUserNames: Array<any> = [
 			undefined,
 			null,

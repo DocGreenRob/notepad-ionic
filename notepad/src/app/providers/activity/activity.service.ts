@@ -38,7 +38,7 @@ export class ActivityService {
 		if (userName === undefined ||
 			userName === null ||
 			userName.trim() === '') {
-			throw new Error(`ArgumentNullError: Username is not specified.`);
+			throw new Error(`Username is not specified.`);
 		}
 
 		if (count === 0) {
