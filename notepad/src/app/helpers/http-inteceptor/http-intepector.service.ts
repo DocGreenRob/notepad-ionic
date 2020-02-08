@@ -26,6 +26,12 @@ import { TestDataFactory } from '../../test-data-factory/test-data-factory';
 })
 export class HttpIntepectorService implements HttpInterceptor {
 
+	private applyCredentials = function (req) {
+		return req.clone({
+			headers: req.headers.set('Authorization', 'Bearer ' + localStorage.getItem('notepad-app-token'))
+		});
+	};
+
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		const {
 			url,
@@ -51,12 +57,15 @@ export class HttpIntepectorService implements HttpInterceptor {
 					return activityFeed(10, 0);
 				case url.endsWith('http://api.cognitivegenerationenterprises.com/api/activity/getFeed/DocGreenRob/11/10') && method === 'GET':
 					return activityFeed(10, 11);
+				// unknown = we don't know who you are
 				case url.endsWith('http://api.cognitivegenerationenterprises.com/api/activity/getFeed/unknown-user/0/10') && method === 'GET':
-					return activityFeed(10, 0);
+					return error('Invalid User');
 				case url.endsWith('http://api.cognitivegenerationenterprises.com/api/activity/getFeed/unauthorized-user/0/10') && method === 'GET':
 					return unauthorized();
+				// unknown = we know who you are, but your account is expired, unvalidated, but your credentials are good, but for some business
+				//			 reason you are "invalid"
 				case url.endsWith('http://api.cognitivegenerationenterprises.com/api/activity/getFeed/invalid-user/0/10') && method === 'GET':
-					return activityFeed(10, 0);
+					return error('Invalid User');
 				default:
 					// pass through any requests not handled above
 					return next.handle(req);
@@ -66,13 +75,13 @@ export class HttpIntepectorService implements HttpInterceptor {
 		// route functions
 		async function activityFeed(count?: number, seed: number = 0) {
 			var activityFeed = new TestDataFactory().GetActivityFeed(count, seed);
-			return (ok(activityFeed)).toPromise();
+			return next.handle(ok(activityFeed));
 		}
 
 		// helper functions
 
 		function ok(body?) {
-			return of(new HttpResponse({ status: 200, body }))
+			return new HttpResponse({ status: 200, body });
 		}
 
 		function unauthorized() {

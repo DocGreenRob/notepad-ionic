@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 /************ Manual Imports ************/
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Observable } from 'rxjs';
 //import 'rxjs/add/operator/toPromise';
 
 export interface ActivityFeed {
@@ -30,9 +31,9 @@ export class ActivityService {
 	constructor(public http: HttpClient) { }
 
 	// activity/getFeed/{userName}/{seed}/{count}
-	async getFeed(userName: string,
+	getFeed(userName: string,
 		seed: number = 0,
-		count: number = 100) {
+		count: number = 100) : Observable<ActivityFeed[]>{
 
 		/******* Housekeeping *******/
 		if (userName === undefined ||
@@ -55,6 +56,6 @@ export class ActivityService {
 		let url = `${environment.apiEndpoint}activity/getFeed/${userName}/${seed}/${count}`;
 
 		/******* Action *******/
-		return this.http.get<ActivityFeed[]>(url).toPromise();
+		return this.http.get<ActivityFeed[]>(url);
 	}
 }

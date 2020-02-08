@@ -25,14 +25,13 @@ export class ActivityPage implements OnInit {
 	}
 
 	public async GetFeed() {
-		await this.activityService.getFeed('DocGreenRob', this.seed, this.count)
-			.then(
+		await this.activityService.getFeed(this.userName, this.seed, this.count)
+			.subscribe(
 				(x: any) => {
 					this.activityFeed = x;
 				},
 				(err) => { }
-			)
-			.catch(x => { console.log(x); });
+			);
 	}
 
 }

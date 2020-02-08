@@ -1,9 +1,10 @@
 ﻿import { ActivityFeed } from '../providers/activity/activity.service';
+import { Observable, of } from 'rxjs';
 
 export class TestDataFactory {
 
 	// ActivityFeed
-	GetActivityFeed(count?: number, seed: number = 0): ActivityFeed[] {
+	GetActivityFeed(count?: number, seed: number = 0): Observable<ActivityFeed[]> {
 
 		let activityFeed: ActivityFeed[] = [
 			{
@@ -1884,14 +1885,14 @@ export class TestDataFactory {
 		}
 
 		if (seed === 0) {
-			return activityFeed.slice(seed, count);
+			return of(activityFeed.slice(seed, count));
 		}
 		else {
 			if (count === 0) {
-				return new Array<ActivityFeed>();
+				return of(new Array<ActivityFeed>());
 			}
 
-			return activityFeed.slice(seed - 1, ((seed + count) - 1));
+			return of(activityFeed.slice(seed - 1, ((seed + count) - 1)));
 		}
 
 	}
