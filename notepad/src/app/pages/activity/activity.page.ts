@@ -11,22 +11,27 @@ import { ActivityService } from 'src/app/providers/activity/activity.service';
 export class ActivityPage implements OnInit {
 
 	// class properties / fields
-	activityFeed: any = [];
+	public activityFeed: any = [];
+	public count: number = 10;
+	public seed: number = 0;
+	public userName: string = 'DocGreenRob';
 
 	constructor(
 		private activityService: ActivityService) {
 	}
 
 	ngOnInit() {
-		// get feed
 		this.GetFeed();
 	}
 
-	async GetFeed() {
-		await this.activityService.getFeed('DocGreenRob', 0, 10)
-			.then((x: any) => {
-				this.activityFeed = x;
-			})
+	public async GetFeed() {
+		await this.activityService.getFeed('DocGreenRob', this.seed, this.count)
+			.then(
+				(x: any) => {
+					this.activityFeed = x;
+				},
+				(err) => { }
+			)
 			.catch(x => { console.log(x); });
 	}
 

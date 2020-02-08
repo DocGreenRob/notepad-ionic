@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 // Http testing module and mocking controller
 import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -9,9 +8,8 @@ import { environment } from '../../../environments/environment';
 
 // https://medium.com/netscape/testing-with-the-angular-httpclient-api-648203820712
 describe('ActivityService', () => {
-	let httpClient: HttpClient;
 	let httpTestingController: HttpTestingController;
-	let service: ActivityService;
+	let activityService: ActivityService;
 
 	beforeEach(async () => {
 		TestBed.configureTestingModule({
@@ -19,13 +17,12 @@ describe('ActivityService', () => {
 			providers: [ActivityService]
 		});
 
-		service = TestBed.get(ActivityService);
-		httpClient = TestBed.get(HttpClient);
+		activityService = TestBed.get(ActivityService);
 		httpTestingController = TestBed.get(HttpTestingController);
 	});
 
 	it('should be created', () => {
-		expect(service).toBeTruthy();
+		expect(activityService).toBeTruthy();
 	});
 
 	// +____________________________+
@@ -45,7 +42,7 @@ describe('ActivityService', () => {
 		let endpoint: string = `${baseUri}${api}`;
 
 		// Act
-		service.getFeed(userName, seed, count).then((x) => {
+		activityService.getFeed(userName, seed, count).then((x) => {
 			expect(x.length).toBe(count);
 			expect(x[0].Id).toBe(1);
 			expect(x[0].Type).toBe('Exercise: Chest - Decline Push-Ups');
@@ -76,7 +73,7 @@ describe('ActivityService', () => {
 		let userName: string = 'test-user-with-records';
 
 		// Act
-		let promise = service.getFeed(userName, seed, count);
+		let promise = activityService.getFeed(userName, seed, count);
 
 		// Assert
 		promise.catch((x) => {
@@ -94,7 +91,7 @@ describe('ActivityService', () => {
 		let userName: string = 'test-user-with-records';
 
 		// Act
-		let promise = service.getFeed(userName, seed, count);
+		let promise = activityService.getFeed(userName, seed, count);
 
 		// Assert
 		promise.catch((x) => {
@@ -116,7 +113,7 @@ describe('ActivityService', () => {
 
 		invalidUserNames.forEach((x) => {
 			// Act
-			let promise = service.getFeed(x, seed, count);
+			let promise = activityService.getFeed(x, seed, count);
 
 			// Assert
 
@@ -139,10 +136,10 @@ describe('ActivityService', () => {
 	// may not need to test the TestDataFactory - in large part - because the responsiblity of returning the correct data per request is of the Api...
 	it('should get the first record', () => {
 		// Arrange
-		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(1)));
+		let spy = spyOn(activityService, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(1)));
 
 		// Act (trigger)
-		service.getFeed('test-user', 0, 1);
+		activityService.getFeed('test-user', 0, 1);
 
 		// Assert
 		spy.calls.mostRecent().returnValue.then((x: ActivityFeed[]) => {
@@ -159,10 +156,10 @@ describe('ActivityService', () => {
 		// Arrange
 		let seed: number = 2;
 		let count: number = 2;
-		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(count, seed)));
+		let spy = spyOn(activityService, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(count, seed)));
 
 		// Act
-		service.getFeed('test-user', seed, count);
+		activityService.getFeed('test-user', seed, count);
 
 		// Assert
 		spy.calls.mostRecent().returnValue.then((x) => {
@@ -182,10 +179,10 @@ describe('ActivityService', () => {
 	it('should return empty Array if user doesn\'t have any records', () => {
 		// Arrange
 		let count: number = 0;
-		let spy = spyOn(service, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(count)));
+		let spy = spyOn(activityService, 'getFeed').and.returnValue(Promise.resolve(new TestDataFactory().GetActivityFeed(count)));
 
 		// Act
-		service.getFeed('test-user-without-records', 0, count);
+		activityService.getFeed('test-user-without-records', 0, count);
 
 		// Assert
 		spy.calls.mostRecent().returnValue.then((x) => {

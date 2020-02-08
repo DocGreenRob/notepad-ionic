@@ -34,7 +34,7 @@ export class ActivityService {
 		seed: number = 0,
 		count: number = 100) {
 
-		/******* housekeeping *******/
+		/******* Housekeeping *******/
 		if (userName === undefined ||
 			userName === null ||
 			userName.trim() === '') {
@@ -51,10 +51,10 @@ export class ActivityService {
 			throw new RangeError(`The max count is ${maxCount}`);
 		}
 
-		/******* prepare *******/
+		/******* Prepare *******/
 		let url = `${environment.apiEndpoint}activity/getFeed/${userName}/${seed}/${count}`;
 
-		/******* action *******/
+		/******* Action *******/
 		return this.http.get<ActivityFeed[]>(url).toPromise();
 	}
 }
